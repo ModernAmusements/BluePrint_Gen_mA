@@ -4,34 +4,98 @@ const path = require('path');
 const { spawn } = require('child_process');
 const PNG = require('pngjs').PNG;
 
-const SVG_PATH = path.resolve(__dirname, 'test.svg');
+// Usage:
+//   node render-video.js [svg-file] [output-base]
+// Examples:
+//   node render-video.js test.svg animation
+//   node render-video.js robotarm.svg robotarm
+const svgArg = process.argv[2] || 'test.svg';
+const svgBase = path.basename(svgArg, path.extname(svgArg));
+const outputBase = process.argv[3] || (svgBase === 'test' ? 'animation' : svgBase);
+
+const SVG_PATH = path.resolve(__dirname, svgArg);
 const OUTPUT_DIR = path.resolve(__dirname, 'frames');
-const OUTPUT_MP4 = path.resolve(__dirname, 'animation.mp4');
-const OUTPUT_PRORES = path.resolve(__dirname, 'animation-prores4444.mov');
-const OUTPUT_APNG = path.resolve(__dirname, 'animation.apng');
+const OUTPUT_MP4 = path.resolve(__dirname, `${outputBase}.mp4`);
+const OUTPUT_PRORES = path.resolve(__dirname, `${outputBase}-prores4444.mov`);
+const OUTPUT_APNG = path.resolve(__dirname, `${outputBase}.apng`);
 const FRAME_RATE = 30;
 const DURATION = 5;
 
-// Native SVG aspect ratio (143:86)
-const SVG_WIDTH = 143;
-const SVG_HEIGHT = 86;
-
-// Final video resolution. Artwork is scaled to full height and centered.
 const OUTPUT_WIDTH = 1920;
 const OUTPUT_HEIGHT = 1080;
-const ART_WIDTH = Math.round(OUTPUT_HEIGHT * (SVG_WIDTH / SVG_HEIGHT));
-const ART_HEIGHT = OUTPUT_HEIGHT;
 
 const TOTAL_FRAMES = FRAME_RATE * DURATION;
-const FRAME_SIZE = OUTPUT_WIDTH * OUTPUT_HEIGHT * 4;
+
+function getSvgDimensions(svgContent) {
+  const viewBox = svgContent.match(/viewBox="([^"]+)"/i);
+  if (viewBox) {
+    const parts = viewBox[1].trim().split(/[\s,]+/).map(Number);
+    if (parts.length === 4 && parts[2] > 0 && parts[3] > 0) {
+      return { width: parts[2], height: parts[3] };
+    }
+  }
+  const width = svgContent.match(/\bwidth="([\d.]+)"/i);
+  const height = svgContent.match(/\bheight="([\d.]+)"/i);
+  return {
+    width: width ? Number(width[1]) : 1,
+    height: height ? Number(height[1]) : 1
+  };
+}
 
 async function main() {
+  if (!fs.existsSync(SVG_PATH)) {
+    throw new Error(`SVG not found: ${SVG_PATH}`);
+  }
+
+  const svgContent = fs.readFileSync(SVG_PATH, 'utf-8');
+  const hasAnimation = /@keyframes|<animate/i.test(svgContent);
+  const svgDims = getSvgDimensions(svgContent);
+  const artWidth = Math.round(OUTPUT_HEIGHT * (svgDims.width / svgDims.height));
+
+  // Static SVGs get the same staggered stroke-draw treatment as test.svg.
+  const autoAnimCss = hasAnimation ? '' : `
+    .auto-draw path:not([fill="black"]) {
+      stroke-dasharray: var(--len);
+      stroke-dashoffset: var(--len);
+      opacity: 0;
+      animation: autoDrawIn 1.2s ease-out forwards;
+    }
+    .auto-draw path[fill="black"] {
+      opacity: 0;
+      animation: autoFadeIn 0.8s ease-out forwards;
+    }
+    @keyframes autoDrawIn {
+      from { stroke-dashoffset: var(--len); opacity: 0; }
+      to   { stroke-dashoffset: 0; opacity: 1; }
+    }
+    @keyframes autoFadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }`;
+
+  const autoAnimScript = hasAnimation ? '' : `
+    <script>
+      (function () {
+        const svg = document.querySelector('svg');
+        if (!svg) return;
+        const paths = Array.from(svg.querySelectorAll('path'));
+        const total = paths.length;
+        const maxDelay = 2.8;
+        paths.forEach((p, i) => {
+          let len = 100;
+          try { len = Math.ceil(p.getTotalLength()); } catch (e) {}
+          p.style.setProperty('--len', len);
+          p.style.animationDelay = (maxDelay * (i / Math.max(1, total - 1))).toFixed(3) + 's';
+        });
+        svg.classList.add('auto-draw');
+      })();
+    </script>`;
+
   if (fs.existsSync(OUTPUT_DIR)) {
     fs.rmSync(OUTPUT_DIR, { recursive: true });
   }
   fs.mkdirSync(OUTPUT_DIR);
 
-  const svgContent = fs.readFileSync(SVG_PATH, 'utf-8');
   const htmlContent = `
 <!DOCTYPE html>
 <html>
@@ -52,30 +116,18 @@ async function main() {
     }
     svg {
       display: block;
-      width: ${ART_WIDTH}px;
-      height: ${ART_HEIGHT}px;
+      width: ${artWidth}px;
+      height: ${OUTPUT_HEIGHT}px;
       background: transparent;
     }
     ::before, ::after { background: transparent; }
+    ${autoAnimCss}
   </style>
 </head>
 <body>
   ${svgContent}
+  ${autoAnimScript}
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const svg = document.querySelector('svg');
-      if (svg) {
-        const styleSheets = Array.from(document.styleSheets);
-        styleSheets.forEach(sheet => {
-          try {
-            Array.from(sheet.cssRules || []).forEach(rule => {
-              if (rule.keyframes) {}
-            });
-          } catch (e) {}
-        });
-      }
-    });
-
     window.seekTo = function(time) {
       // Deterministically seek every CSS animation to the requested time.
       for (const animation of document.getAnimations()) {
@@ -104,21 +156,20 @@ async function main() {
   await new Promise(r => setTimeout(r, 500));
   await page.evaluate(() => window.seekTo(0));
 
-  console.log(`Capturing ${TOTAL_FRAMES} frames at ${OUTPUT_WIDTH}x${OUTPUT_HEIGHT}, ${FRAME_RATE}fps...`);
+  console.log(`Rendering ${path.basename(SVG_PATH)} -> ${OUTPUT_WIDTH}x${OUTPUT_HEIGHT}, ${FRAME_RATE}fps, ${DURATION}s`);
+  console.log(`Capturing ${TOTAL_FRAMES} frames...`);
 
   const rawFramesPath = path.join(OUTPUT_DIR, 'frames-rgba.raw');
   const rawFd = fs.openSync(rawFramesPath, 'w');
 
   for (let i = 0; i < TOTAL_FRAMES; i++) {
     const time = i / FRAME_RATE;
-
     await page.evaluate((t) => window.seekTo(t), time);
-
     await new Promise(r => setTimeout(r, 30));
 
     const pngBuffer = await page.screenshot({ omitBackground: true, type: 'png' });
     const png = PNG.sync.read(pngBuffer);
-    // Preserve original colors (black strokes) and alpha.
+    // Preserve original colors and alpha exactly.
     fs.writeSync(rawFd, png.data);
 
     if (i % 30 === 0) console.log(`  Frame ${i}/${TOTAL_FRAMES} (${time.toFixed(1)}s)`);
@@ -128,18 +179,15 @@ async function main() {
   await browser.close();
   console.log('Frames captured. Encoding...');
 
-  // 1) MP4 with HEVC alpha (Apple HEVC + alpha, hvc1 tag)
   const mp4Ok = await encodeMp4HevcAlpha(rawFramesPath).catch(err => {
     console.error('\nMP4 HEVC alpha failed:', err.message);
     return false;
   });
   if (mp4Ok) console.log(`\n✓ Transparent MP4 (HEVC alpha): ${OUTPUT_MP4}`);
 
-  // 2) ProRes 4444 MOV (universally supported transparent format for editors)
   await encodeProRes4444(rawFramesPath);
   console.log(`✓ Transparent ProRes 4444: ${OUTPUT_PRORES}`);
 
-  // 3) APNG (web)
   await encodeApng(rawFramesPath);
   console.log(`✓ Transparent APNG: ${OUTPUT_APNG}`);
 

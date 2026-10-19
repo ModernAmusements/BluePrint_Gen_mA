@@ -4,7 +4,8 @@
   "description": "",
   "main": "render-video.js",
   "scripts": {
-    "render": "node render-video.js"
+    "render": "node render-video.js test.svg animation",
+    "render:robotarm": "node render-video.js robotarm.svg robotarm"
   },
   "keywords": [],
   "author": "",
