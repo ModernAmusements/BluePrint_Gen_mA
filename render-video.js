@@ -11,10 +11,19 @@ const OUTPUT_PRORES = path.resolve(__dirname, 'animation-prores4444.mov');
 const OUTPUT_APNG = path.resolve(__dirname, 'animation.apng');
 const FRAME_RATE = 30;
 const DURATION = 5;
+
+// Native SVG aspect ratio (143:86)
+const SVG_WIDTH = 143;
+const SVG_HEIGHT = 86;
+
+// Final video resolution. Artwork is scaled to full height and centered.
+const OUTPUT_WIDTH = 1920;
+const OUTPUT_HEIGHT = 1080;
+const ART_WIDTH = Math.round(OUTPUT_HEIGHT * (SVG_WIDTH / SVG_HEIGHT));
+const ART_HEIGHT = OUTPUT_HEIGHT;
+
 const TOTAL_FRAMES = FRAME_RATE * DURATION;
-const WIDTH = 143;
-const HEIGHT = 86;
-const FRAME_SIZE = WIDTH * HEIGHT * 4;
+const FRAME_SIZE = OUTPUT_WIDTH * OUTPUT_HEIGHT * 4;
 
 async function main() {
   if (fs.existsSync(OUTPUT_DIR)) {
@@ -30,8 +39,23 @@ async function main() {
   <meta charset="utf-8">
   <style>
     * { margin: 0; padding: 0; }
-    html, body { background: transparent !important; width: ${WIDTH}px; height: ${HEIGHT}px; overflow: hidden; }
-    svg { display: block; background: transparent; }
+    html, body {
+      background: transparent !important;
+      width: ${OUTPUT_WIDTH}px;
+      height: ${OUTPUT_HEIGHT}px;
+      overflow: hidden;
+    }
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    svg {
+      display: block;
+      width: ${ART_WIDTH}px;
+      height: ${ART_HEIGHT}px;
+      background: transparent;
+    }
     ::before, ::after { background: transparent; }
   </style>
 </head>
@@ -52,27 +76,12 @@ async function main() {
       }
     });
 
-    window.seekAnimation = function(time) {
-      const svg = document.querySelector('svg');
-      if (svg && svg.setCurrentTime) svg.setCurrentTime(time);
-      document.documentElement.style.setProperty('--seek-time', time + 's');
-      const animated = document.querySelectorAll('path, g');
-      animated.forEach(el => {
-        const computed = getComputedStyle(el);
-        const delay = parseFloat(computed.animationDelay) || 0;
-        const duration = parseFloat(computed.animationDuration) || 0;
-        if (duration > 0) {
-          const localTime = Math.max(0, time - delay);
-          const progress = Math.min(1, localTime / duration);
-          if (el.style.strokeDasharray) {
-            const len = parseFloat(el.style.strokeDasharray) || 0;
-            el.style.strokeDashoffset = len * (1 - progress) + 'px';
-            el.style.opacity = progress;
-          } else if (computed.fill === 'rgb(0, 0, 0)' || computed.fill === 'black') {
-            el.style.opacity = progress;
-          }
-        }
-      });
+    window.seekTo = function(time) {
+      // Deterministically seek every CSS animation to the requested time.
+      for (const animation of document.getAnimations()) {
+        animation.pause();
+        animation.currentTime = time * 1000;
+      }
     };
   </script>
 </body>
@@ -84,7 +93,7 @@ async function main() {
   });
 
   const page = await browser.newPage();
-  await page.setViewport({ width: WIDTH, height: HEIGHT, deviceScaleFactor: 1 });
+  await page.setViewport({ width: OUTPUT_WIDTH, height: OUTPUT_HEIGHT, deviceScaleFactor: 1 });
   await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
 
   await page.evaluate(() => {
@@ -93,8 +102,9 @@ async function main() {
   });
 
   await new Promise(r => setTimeout(r, 500));
+  await page.evaluate(() => window.seekTo(0));
 
-  console.log(`Capturing ${TOTAL_FRAMES} frames at ${FRAME_RATE}fps...`);
+  console.log(`Capturing ${TOTAL_FRAMES} frames at ${OUTPUT_WIDTH}x${OUTPUT_HEIGHT}, ${FRAME_RATE}fps...`);
 
   const rawFramesPath = path.join(OUTPUT_DIR, 'frames-rgba.raw');
   const rawFd = fs.openSync(rawFramesPath, 'w');
@@ -102,35 +112,13 @@ async function main() {
   for (let i = 0; i < TOTAL_FRAMES; i++) {
     const time = i / FRAME_RATE;
 
-    await page.evaluate((t) => {
-      const svg = document.querySelector('svg');
-      if (svg && svg.setCurrentTime) svg.setCurrentTime(t);
-      document.documentElement.style.setProperty('--seek-time', t + 's');
-      const animated = document.querySelectorAll('path, g');
-      animated.forEach(el => {
-        const computed = getComputedStyle(el);
-        const delay = parseFloat(computed.animationDelay) || 0;
-        const duration = parseFloat(computed.animationDuration) || 0;
-        if (duration > 0) {
-          const localTime = Math.max(0, t - delay);
-          const progress = Math.min(1, localTime / duration);
-          if (el.style.strokeDasharray) {
-            const len = parseFloat(el.style.strokeDasharray) || 0;
-            el.style.strokeDashoffset = len * (1 - progress) + 'px';
-            el.style.opacity = progress;
-          } else if (computed.fill === 'rgb(0, 0, 0)' || computed.fill === 'black') {
-            el.style.opacity = progress;
-          }
-        }
-      });
-    }, time);
+    await page.evaluate((t) => window.seekTo(t), time);
 
-    await new Promise(r => setTimeout(r, 50));
+    await new Promise(r => setTimeout(r, 30));
 
     const pngBuffer = await page.screenshot({ omitBackground: true, type: 'png' });
     const png = PNG.sync.read(pngBuffer);
-    // Preserve the original colors (black strokes) and alpha exactly.
-    // For black pixels, the straight-alpha RGBA values are already RGB=0 + alpha coverage.
+    // Preserve original colors (black strokes) and alpha.
     fs.writeSync(rawFd, png.data);
 
     if (i % 30 === 0) console.log(`  Frame ${i}/${TOTAL_FRAMES} (${time.toFixed(1)}s)`);
@@ -148,7 +136,6 @@ async function main() {
   if (mp4Ok) console.log(`\n✓ Transparent MP4 (HEVC alpha): ${OUTPUT_MP4}`);
 
   // 2) ProRes 4444 MOV (universally supported transparent format for editors)
-  // ProRes requires even dimensions; pad 143 -> 144 with a transparent column.
   await encodeProRes4444(rawFramesPath);
   console.log(`✓ Transparent ProRes 4444: ${OUTPUT_PRORES}`);
 
@@ -182,14 +169,14 @@ function encodeMp4HevcAlpha(rawFramesPath) {
     '-y',
     '-f', 'rawvideo',
     '-pix_fmt', 'rgba',
-    '-s', `${WIDTH}x${HEIGHT}`,
+    '-s', `${OUTPUT_WIDTH}x${OUTPUT_HEIGHT}`,
     '-framerate', String(FRAME_RATE),
     '-i', rawFramesPath,
-    '-vf', `format=rgba,pad=144:${HEIGHT}:0:0:color=black@0,format=bgra`,
+    '-vf', 'format=bgra',
     '-c:v', 'hevc_videotoolbox',
     '-alpha_quality', '1',
     '-allow_sw', '1',
-    '-b:v', '5M',
+    '-b:v', '25M',
     '-tag:v', 'hvc1',
     '-pix_fmt', 'bgra',
     OUTPUT_MP4
@@ -197,15 +184,14 @@ function encodeMp4HevcAlpha(rawFramesPath) {
 }
 
 function encodeProRes4444(rawFramesPath) {
-  // 143 is odd; ProRes needs even dimensions. Pad right with transparent pixels.
   return runFfmpeg([
     '-y',
     '-f', 'rawvideo',
     '-pix_fmt', 'rgba',
-    '-s', `${WIDTH}x${HEIGHT}`,
+    '-s', `${OUTPUT_WIDTH}x${OUTPUT_HEIGHT}`,
     '-framerate', String(FRAME_RATE),
     '-i', rawFramesPath,
-    '-vf', `format=rgba,pad=144:${HEIGHT}:0:0:color=black@0,format=yuva444p10le`,
+    '-vf', 'format=yuva444p10le',
     '-c:v', 'prores_ks',
     '-profile:v', '4444',
     '-alpha_bits', '16',
@@ -219,7 +205,7 @@ function encodeApng(rawFramesPath) {
     '-y',
     '-f', 'rawvideo',
     '-pix_fmt', 'rgba',
-    '-s', `${WIDTH}x${HEIGHT}`,
+    '-s', `${OUTPUT_WIDTH}x${OUTPUT_HEIGHT}`,
     '-framerate', String(FRAME_RATE),
     '-i', rawFramesPath,
     '-c:v', 'apng',

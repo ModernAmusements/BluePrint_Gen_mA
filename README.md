@@ -12,7 +12,7 @@ The bundled `test.svg` is a technical blueprint illustration with a staggered st
 | `animation-prores4444.mov` | ProRes 4444 with alpha | Industry-standard transparent format for Premiere Pro, After Effects, DaVinci Resolve, Final Cut |
 | `animation.apng` | Animated PNG (RGBA) | Infinite-loop transparent animation for the web (`<img src="animation.apng">`) |
 
-All outputs are **144x86, 30 fps, 5 seconds** (150 frames). The source SVG is 143x86; one transparent column is padded because ProRes and HEVC require even dimensions.
+All outputs are **1920x1080, 30 fps, 5 seconds** (150 frames). The artwork is scaled to full height (1796 px wide) and centered on a transparent 1080p canvas, ready to drop into a 1080p timeline.
 
 ## Requirements
 
@@ -31,7 +31,7 @@ npm run render
 The script:
 
 1. Loads `test.svg` into headless Chrome with a transparent background.
-2. Seeks the animation to each frame (30 fps) and captures it as RGBA.
+2. Pauses and seeks every CSS animation deterministically using the Web Animations API, then captures each frame as RGBA.
 3. Encodes the frames into MP4 (HEVC + alpha), ProRes 4444 (alpha), and APNG.
 4. Cleans up intermediate frames.
 
@@ -40,14 +40,17 @@ The script:
 Edit the constants at the top of `render-video.js`:
 
 ```js
-const SVG_PATH = path.resolve(__dirname, 'test.svg');
 const FRAME_RATE = 30;
-const DURATION = 5;      // seconds
-const WIDTH = 143;
-const HEIGHT = 86;
+const DURATION = 5;          // seconds
+
+const SVG_WIDTH = 143;       // native SVG viewBox
+const SVG_HEIGHT = 86;
+
+const OUTPUT_WIDTH = 1920;   // final video resolution
+const OUTPUT_HEIGHT = 1080;
 ```
 
-Drop in another animated SVG and point `SVG_PATH` at it. The frame count is `FRAME_RATE * DURATION`.
+Drop in another animated SVG and point `SVG_PATH` at it. The frame count is `FRAME_RATE * DURATION`. Increase `OUTPUT_WIDTH`/`OUTPUT_HEIGHT` for 4K renders.
 
 ## Transparency Notes
 
