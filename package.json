@@ -1,0 +1,17 @@
+{
+  "name": "blueprint_gen_ma",
+  "version": "1.0.0",
+  "description": "",
+  "main": "render-video.js",
+  "scripts": {
+    "render": "node render-video.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "pngjs": "^7.0.0",
+    "puppeteer": "^25.14.0"
+  }
+}
