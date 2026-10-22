@@ -5,10 +5,11 @@ const { spawn } = require('child_process');
 const PNG = require('pngjs').PNG;
 
 // Usage:
-//   node render-video.js [svg-file] [output-base]
+//   node render-video.js [svg-file] [output-base] [WIDTHxHEIGHT]
 // Examples:
 //   node render-video.js test.svg animation
 //   node render-video.js robotarm.svg robotarm
+//   node render-video.js network.svg network 1080x1350
 const svgArg = process.argv[2] || 'test.svg';
 const svgBase = path.basename(svgArg, path.extname(svgArg));
 const outputBase = process.argv[3] || (svgBase === 'test' ? 'animation' : svgBase);
@@ -20,9 +21,6 @@ const OUTPUT_PRORES = path.resolve(__dirname, `${outputBase}-prores4444.mov`);
 const OUTPUT_APNG = path.resolve(__dirname, `${outputBase}.apng`);
 const FRAME_RATE = 30;
 const DURATION = 5;
-
-const OUTPUT_WIDTH = 1920;
-const OUTPUT_HEIGHT = 1080;
 
 const TOTAL_FRAMES = FRAME_RATE * DURATION;
 
@@ -50,7 +48,38 @@ async function main() {
   const svgContent = fs.readFileSync(SVG_PATH, 'utf-8');
   const hasAnimation = /@keyframes|<animate/i.test(svgContent);
   const svgDims = getSvgDimensions(svgContent);
-  const artWidth = Math.round(OUTPUT_HEIGHT * (svgDims.width / svgDims.height));
+
+  // Optional explicit canvas size, e.g. "1080x1350". Artwork is fitted inside it.
+  const sizeArg = process.argv[4];
+  const customSize = /^(\d+)x(\d+)$/i.exec(sizeArg || '');
+
+  // Auto-detect orientation: vertical (9:16) or landscape (16:9)
+  const isVertical = svgDims.height > svgDims.width;
+  const OUTPUT_WIDTH = customSize ? Number(customSize[1]) : (isVertical ? 1080 : 1920);
+  const OUTPUT_HEIGHT = customSize ? Number(customSize[2]) : (isVertical ? 1920 : 1080);
+
+  let artWidth = OUTPUT_WIDTH;
+  let artHeight = OUTPUT_HEIGHT;
+
+  if (customSize) {
+    const scale = Math.min(OUTPUT_WIDTH / svgDims.width, OUTPUT_HEIGHT / svgDims.height);
+    artWidth = Math.round(svgDims.width * scale);
+    artHeight = Math.round(svgDims.height * scale);
+  } else if (isVertical) {
+    artHeight = OUTPUT_HEIGHT;
+    artWidth = Math.round(OUTPUT_HEIGHT * (svgDims.width / svgDims.height));
+    if (artWidth > OUTPUT_WIDTH) {
+      artWidth = OUTPUT_WIDTH;
+      artHeight = Math.round(OUTPUT_WIDTH * (svgDims.height / svgDims.width));
+    }
+  } else {
+    artWidth = Math.round(OUTPUT_HEIGHT * (svgDims.width / svgDims.height));
+    artHeight = OUTPUT_HEIGHT;
+    if (artWidth > OUTPUT_WIDTH) {
+      artWidth = OUTPUT_WIDTH;
+      artHeight = Math.round(OUTPUT_WIDTH * (svgDims.height / svgDims.width));
+    }
+  }
 
   // Static SVGs get the same staggered stroke-draw treatment as test.svg.
   const autoAnimCss = hasAnimation ? '' : `
@@ -117,7 +146,7 @@ async function main() {
     svg {
       display: block;
       width: ${artWidth}px;
-      height: ${OUTPUT_HEIGHT}px;
+      height: ${artHeight}px;
       background: transparent;
     }
     ::before, ::after { background: transparent; }
@@ -133,6 +162,12 @@ async function main() {
       for (const animation of document.getAnimations()) {
         animation.pause();
         animation.currentTime = time * 1000;
+      }
+      // Deterministically seek SMIL animations (<animateMotion>, <animate>, etc.)
+      const svg = document.querySelector('svg');
+      if (svg && typeof svg.pauseAnimations === 'function') {
+        svg.pauseAnimations();
+        svg.setCurrentTime(time);
       }
     };
   </script>
@@ -179,16 +214,16 @@ async function main() {
   await browser.close();
   console.log('Frames captured. Encoding...');
 
-  const mp4Ok = await encodeMp4HevcAlpha(rawFramesPath).catch(err => {
+  const mp4Ok = await encodeMp4HevcAlpha(rawFramesPath, OUTPUT_WIDTH, OUTPUT_HEIGHT).catch(err => {
     console.error('\nMP4 HEVC alpha failed:', err.message);
     return false;
   });
   if (mp4Ok) console.log(`\n✓ Transparent MP4 (HEVC alpha): ${OUTPUT_MP4}`);
 
-  await encodeProRes4444(rawFramesPath);
+  await encodeProRes4444(rawFramesPath, OUTPUT_WIDTH, OUTPUT_HEIGHT);
   console.log(`✓ Transparent ProRes 4444: ${OUTPUT_PRORES}`);
 
-  await encodeApng(rawFramesPath);
+  await encodeApng(rawFramesPath, OUTPUT_WIDTH, OUTPUT_HEIGHT);
   console.log(`✓ Transparent APNG: ${OUTPUT_APNG}`);
 
   fs.rmSync(OUTPUT_DIR, { recursive: true });
@@ -212,12 +247,12 @@ function runFfmpeg(args) {
   });
 }
 
-function encodeMp4HevcAlpha(rawFramesPath) {
+function encodeMp4HevcAlpha(rawFramesPath, width, height) {
   return runFfmpeg([
     '-y',
     '-f', 'rawvideo',
     '-pix_fmt', 'rgba',
-    '-s', `${OUTPUT_WIDTH}x${OUTPUT_HEIGHT}`,
+    '-s', `${width}x${height}`,
     '-framerate', String(FRAME_RATE),
     '-i', rawFramesPath,
     '-vf', 'format=bgra',
@@ -231,12 +266,12 @@ function encodeMp4HevcAlpha(rawFramesPath) {
   ]).then(() => true);
 }
 
-function encodeProRes4444(rawFramesPath) {
+function encodeProRes4444(rawFramesPath, width, height) {
   return runFfmpeg([
     '-y',
     '-f', 'rawvideo',
     '-pix_fmt', 'rgba',
-    '-s', `${OUTPUT_WIDTH}x${OUTPUT_HEIGHT}`,
+    '-s', `${width}x${height}`,
     '-framerate', String(FRAME_RATE),
     '-i', rawFramesPath,
     '-vf', 'format=yuva444p10le',
@@ -248,12 +283,12 @@ function encodeProRes4444(rawFramesPath) {
   ]);
 }
 
-function encodeApng(rawFramesPath) {
+function encodeApng(rawFramesPath, width, height) {
   return runFfmpeg([
     '-y',
     '-f', 'rawvideo',
     '-pix_fmt', 'rgba',
-    '-s', `${OUTPUT_WIDTH}x${OUTPUT_HEIGHT}`,
+    '-s', `${width}x${height}`,
     '-framerate', String(FRAME_RATE),
     '-i', rawFramesPath,
     '-c:v', 'apng',

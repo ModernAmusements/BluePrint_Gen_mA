@@ -1,0 +1,253 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1350" viewBox="0 0 1080 1350" fill="none">
+  <style>
+    text { font-family: "SF Mono", Menlo, "Roboto Mono", monospace; fill: #000; user-select: none; }
+
+    .draw { stroke-dasharray: 1; stroke-dashoffset: 1; animation: draw 0.75s cubic-bezier(0.25,0.8,0.25,1) forwards; }
+    @keyframes draw { to { stroke-dashoffset: 0; } }
+
+    .fade { opacity: 0; animation: fade 0.5s ease-out forwards; }
+    @keyframes fade { to { opacity: 1; } }
+
+    .card { opacity: 0; transform: scale(0.97); transform-box: fill-box; transform-origin: center; animation: cardIn 0.6s cubic-bezier(0.2,0.7,0.2,1) forwards; }
+    @keyframes cardIn { to { opacity: 1; transform: scale(1); } }
+
+    .flows { opacity: 0; animation: fade 0.6s 1.35s forwards; }
+    .flow { stroke: #000; stroke-width: 3.2; stroke-linecap: round; stroke-dasharray: 0.1 27.9; opacity: 0.6; animation: flow 0.85s linear infinite; }
+    @keyframes flow { to { stroke-dashoffset: -28; } }
+
+    .blink { animation: blink 1.6s ease-in-out infinite; }
+    @keyframes blink { 0%,100% { opacity: 0.15; } 50% { opacity: 1; } }
+
+    .packets { opacity: 0; animation: fade 0.5s 1.45s forwards; }
+  </style>
+
+  <!-- HEADER -->
+  <g class="fade" style="animation-delay:.05s">
+    <text x="80" y="100" font-size="11" letter-spacing="3">SPINE / 04</text>
+    <text x="1000" y="100" text-anchor="end" font-size="9" letter-spacing="1.4"><tspan class="blink">●</tspan> STATUS 01</text>
+    <text x="80" y="124" font-size="8.5" letter-spacing="2" fill-opacity="0.5">SPINE-LEAF FABRIC / EAST-WEST</text>
+    <text x="1000" y="124" text-anchor="end" font-size="8.5" letter-spacing="1.2" fill-opacity="0.5">2 SPINES · 4 LEAVES</text>
+  </g>
+  <line x1="80" y1="150" x2="1000" y2="150" stroke="#000" stroke-width="1.1" pathLength="1" class="draw" style="animation-delay:.02s"/>
+
+  <!-- FABRIC BOUNDARY -->
+  <g class="fade" style="animation-delay:.12s">
+    <rect x="85" y="285" width="910" height="415" rx="4" fill="none" stroke="#000" stroke-width="1" stroke-dasharray="2 6" stroke-opacity="0.22"/>
+    <text x="95" y="304" font-size="7.5" letter-spacing="2" fill-opacity="0.4">FABRIC</text>
+  </g>
+
+  <!-- SPINE-LEAF LINKS -->
+  <g stroke="#000" stroke-width="1.4">
+    <path d="M 390 420 V 500 H 168 V 580" pathLength="1" class="draw" style="animation-delay:.18s"/>
+    <path d="M 390 420 V 500 H 408 V 580" pathLength="1" class="draw" style="animation-delay:.24s"/>
+    <path d="M 390 420 V 500 H 648 V 580" pathLength="1" class="draw" style="animation-delay:.30s"/>
+    <path d="M 390 420 V 500 H 888 V 580" pathLength="1" class="draw" style="animation-delay:.36s"/>
+    <path d="M 690 420 V 530 H 192 V 580" pathLength="1" class="draw" style="animation-delay:.42s"/>
+    <path d="M 690 420 V 530 H 432 V 580" pathLength="1" class="draw" style="animation-delay:.48s"/>
+    <path d="M 690 420 V 530 H 672 V 580" pathLength="1" class="draw" style="animation-delay:.54s"/>
+    <path d="M 690 420 V 530 H 912 V 580" pathLength="1" class="draw" style="animation-delay:.60s"/>
+  </g>
+
+  <!-- LEAF-WORKLOAD LINKS -->
+  <g stroke="#000" stroke-width="1.4">
+    <path d="M 180 670 V 890" pathLength="1" class="draw" style="animation-delay:.68s"/>
+    <path d="M 420 670 V 890" pathLength="1" class="draw" style="animation-delay:.72s"/>
+    <path d="M 660 670 V 890" pathLength="1" class="draw" style="animation-delay:.76s"/>
+    <path d="M 900 670 V 890" pathLength="1" class="draw" style="animation-delay:.80s"/>
+  </g>
+
+  <!-- SPINES -->
+  <g transform="translate(390,370)">
+    <g class="card" style="animation-delay:.35s">
+      <rect x="-100" y="-50" width="200" height="100" rx="2" stroke="#000" stroke-width="1.6"/>
+      <circle cx="84" cy="-40" r="2.2" fill="#000" class="blink"/>
+      <text x="0" y="-6" text-anchor="middle" font-size="10.5" font-weight="600" letter-spacing="2">SPINE-01</text>
+      <text x="0" y="12" text-anchor="middle" font-size="8" fill-opacity="0.5">10.0.1.1</text>
+    </g>
+  </g>
+
+  <g transform="translate(690,370)">
+    <g class="card" style="animation-delay:.42s">
+      <rect x="-100" y="-50" width="200" height="100" rx="2" stroke="#000" stroke-width="1.6"/>
+      <circle cx="84" cy="-40" r="2.2" fill="#000" class="blink" style="animation-delay:.5s"/>
+      <text x="0" y="-6" text-anchor="middle" font-size="10.5" font-weight="600" letter-spacing="2">SPINE-02</text>
+      <text x="0" y="12" text-anchor="middle" font-size="8" fill-opacity="0.5">10.0.1.2</text>
+    </g>
+  </g>
+
+  <!-- LEAVES -->
+  <g transform="translate(180,625)">
+    <g class="card" style="animation-delay:.55s">
+      <rect x="-85" y="-45" width="170" height="90" rx="2" stroke="#000" stroke-width="1.5"/>
+      <circle cx="74" cy="-35" r="2.2" fill="#000" class="blink" style="animation-delay:.2s"/>
+      <text x="0" y="-4" text-anchor="middle" font-size="10.5" font-weight="600" letter-spacing="2">LEAF-01</text>
+      <text x="0" y="14" text-anchor="middle" font-size="8" fill-opacity="0.5">10.0.2.1</text>
+    </g>
+  </g>
+
+  <g transform="translate(420,625)">
+    <g class="card" style="animation-delay:.60s">
+      <rect x="-85" y="-45" width="170" height="90" rx="2" stroke="#000" stroke-width="1.5"/>
+      <circle cx="74" cy="-35" r="2.2" fill="#000" class="blink" style="animation-delay:.5s"/>
+      <text x="0" y="-4" text-anchor="middle" font-size="10.5" font-weight="600" letter-spacing="2">LEAF-02</text>
+      <text x="0" y="14" text-anchor="middle" font-size="8" fill-opacity="0.5">10.0.2.2</text>
+    </g>
+  </g>
+
+  <g transform="translate(660,625)">
+    <g class="card" style="animation-delay:.65s">
+      <rect x="-85" y="-45" width="170" height="90" rx="2" stroke="#000" stroke-width="1.5"/>
+      <circle cx="74" cy="-35" r="2.2" fill="#000" class="blink" style="animation-delay:.8s"/>
+      <text x="0" y="-4" text-anchor="middle" font-size="10.5" font-weight="600" letter-spacing="2">LEAF-03</text>
+      <text x="0" y="14" text-anchor="middle" font-size="8" fill-opacity="0.5">10.0.2.3</text>
+    </g>
+  </g>
+
+  <g transform="translate(900,625)">
+    <g class="card" style="animation-delay:.70s">
+      <rect x="-85" y="-45" width="170" height="90" rx="2" stroke="#000" stroke-width="1.5"/>
+      <circle cx="74" cy="-35" r="2.2" fill="#000" class="blink" style="animation-delay:.3s"/>
+      <text x="0" y="-4" text-anchor="middle" font-size="10.5" font-weight="600" letter-spacing="2">LEAF-04</text>
+      <text x="0" y="14" text-anchor="middle" font-size="8" fill-opacity="0.5">10.0.2.4</text>
+    </g>
+  </g>
+
+  <!-- WORKLOADS -->
+  <g transform="translate(180,890)">
+    <g class="card" style="animation-delay:.85s">
+      <rect x="-85" y="0" width="170" height="120" rx="2" stroke="#000" stroke-width="1.5"/>
+      <circle cx="74" cy="14" r="2.2" fill="#000" class="blink" style="animation-delay:.2s"/>
+      <g transform="translate(0,32)">
+        <g stroke="#000" stroke-width="1.3">
+          <rect x="-18" y="-17" width="36" height="9" rx="1"/>
+          <rect x="-18" y="-4" width="36" height="9" rx="1"/>
+          <rect x="-18" y="9" width="36" height="9" rx="1"/>
+        </g>
+        <g fill="#000">
+          <circle cx="12" cy="-12.5" r="1.3"/>
+          <circle cx="12" cy="0.5" r="1.3"/>
+          <circle cx="12" cy="13.5" r="1.3"/>
+        </g>
+      </g>
+      <text x="0" y="78" text-anchor="middle" font-size="10.5" font-weight="600" letter-spacing="1.8">COMPUTE</text>
+      <text x="0" y="96" text-anchor="middle" font-size="8" fill-opacity="0.5">K8S · 12 PODS</text>
+    </g>
+  </g>
+
+  <g transform="translate(420,890)">
+    <g class="card" style="animation-delay:.90s">
+      <rect x="-85" y="0" width="170" height="120" rx="2" stroke="#000" stroke-width="1.5"/>
+      <circle cx="74" cy="14" r="2.2" fill="#000" class="blink" style="animation-delay:.5s"/>
+      <g transform="translate(0,32)" stroke="#000">
+        <ellipse cx="0" cy="-12" rx="18" ry="6" stroke-width="1.3"/>
+        <path d="M -18 -12 V 12 A 18 6 0 0 0 18 12 V -12" stroke-width="1.3"/>
+        <path d="M -18 -1 A 18 6 0 0 0 18 -1" stroke-width="1" stroke-opacity="0.5"/>
+      </g>
+      <text x="0" y="78" text-anchor="middle" font-size="10.5" font-weight="600" letter-spacing="1.8">STORAGE</text>
+      <text x="0" y="96" text-anchor="middle" font-size="8" fill-opacity="0.5">CEPH · 240 TB</text>
+    </g>
+  </g>
+
+  <g transform="translate(660,890)">
+    <g class="card" style="animation-delay:.95s">
+      <rect x="-85" y="0" width="170" height="120" rx="2" stroke="#000" stroke-width="1.5"/>
+      <circle cx="74" cy="14" r="2.2" fill="#000" class="blink" style="animation-delay:.8s"/>
+      <g transform="translate(0,32)">
+        <path d="M 0 -19 L 17 -10 V 10 L 0 19 L -17 10 V -10 Z" stroke="#000" stroke-width="1.3"/>
+        <circle r="5" stroke="#000" stroke-width="1.1"/>
+        <path d="M 0 -19 V -5 M 17 -10 L 5 -3 M -17 -10 L -5 -3 M 0 19 V 5 M 17 10 L 5 3 M -17 10 L -5 3" stroke="#000" stroke-width="0.8" stroke-opacity="0.5"/>
+      </g>
+      <text x="0" y="78" text-anchor="middle" font-size="10.5" font-weight="600" letter-spacing="1.8">API</text>
+      <text x="0" y="96" text-anchor="middle" font-size="8" fill-opacity="0.5">8 REPLICAS</text>
+    </g>
+  </g>
+
+  <g transform="translate(900,890)">
+    <g class="card" style="animation-delay:1.00s">
+      <rect x="-85" y="0" width="170" height="120" rx="2" stroke="#000" stroke-width="1.5"/>
+      <circle cx="74" cy="14" r="2.2" fill="#000" class="blink" style="animation-delay:.4s"/>
+      <g transform="translate(0,32)" stroke="#000" stroke-width="1.3">
+        <rect x="-20" y="-14" width="40" height="28" rx="1"/>
+        <path d="M -20 -5 H 20"/>
+        <rect x="-6" y="-11" width="12" height="4" rx="1"/>
+      </g>
+      <text x="0" y="78" text-anchor="middle" font-size="10.5" font-weight="600" letter-spacing="1.8">DATA</text>
+      <text x="0" y="96" text-anchor="middle" font-size="8" fill-opacity="0.5">S3 · 12 TB</text>
+    </g>
+  </g>
+
+  <g class="fade" style="animation-delay:.95s" fill="#000">
+    <circle cx="390" cy="420" r="2.2"/>
+    <circle cx="690" cy="420" r="2.2"/>
+    <circle cx="168" cy="580" r="2"/>
+    <circle cx="192" cy="580" r="2"/>
+    <circle cx="408" cy="580" r="2"/>
+    <circle cx="432" cy="580" r="2"/>
+    <circle cx="648" cy="580" r="2"/>
+    <circle cx="672" cy="580" r="2"/>
+    <circle cx="888" cy="580" r="2"/>
+    <circle cx="912" cy="580" r="2"/>
+    <circle cx="180" cy="890" r="2.2"/>
+    <circle cx="420" cy="890" r="2.2"/>
+    <circle cx="660" cy="890" r="2.2"/>
+    <circle cx="900" cy="890" r="2.2"/>
+  </g>
+
+  <!-- FLOWS -->
+  <g class="flows" fill="none">
+    <path class="flow" d="M 390 420 V 500 H 168 V 580"/>
+    <path class="flow" d="M 390 420 V 500 H 408 V 580"/>
+    <path class="flow" d="M 390 420 V 500 H 648 V 580"/>
+    <path class="flow" d="M 390 420 V 500 H 888 V 580"/>
+    <path class="flow" d="M 690 420 V 530 H 192 V 580"/>
+    <path class="flow" d="M 690 420 V 530 H 432 V 580"/>
+    <path class="flow" d="M 690 420 V 530 H 672 V 580"/>
+    <path class="flow" d="M 690 420 V 530 H 912 V 580"/>
+    <path class="flow" d="M 180 670 V 890"/>
+    <path class="flow" d="M 420 670 V 890"/>
+    <path class="flow" d="M 660 670 V 890"/>
+    <path class="flow" d="M 900 670 V 890"/>
+    <path class="flow" d="M 180 890 V 670" style="animation-duration:1.2s; opacity:.3"/>
+    <path class="flow" d="M 660 890 V 670" style="animation-duration:1.35s; opacity:.3"/>
+  </g>
+
+  <!-- PACKETS -->
+  <g class="packets" fill="#000">
+    <circle r="3.2"><animateMotion path="M 390 420 V 500 H 168 V 580" dur="3.0s" repeatCount="indefinite"/></circle>
+    <circle r="3.2"><animateMotion path="M 390 420 V 500 H 408 V 580" dur="2.8s" begin="0.5s" repeatCount="indefinite"/></circle>
+    <circle r="3.2"><animateMotion path="M 390 420 V 500 H 648 V 580" dur="3.4s" begin="0.2s" repeatCount="indefinite"/></circle>
+    <circle r="3.2"><animateMotion path="M 390 420 V 500 H 888 V 580" dur="3.6s" begin="0.8s" repeatCount="indefinite"/></circle>
+    <circle r="3.2"><animateMotion path="M 690 420 V 530 H 192 V 580" dur="3.8s" begin="0.3s" repeatCount="indefinite"/></circle>
+    <circle r="3.2"><animateMotion path="M 690 420 V 530 H 432 V 580" dur="3.2s" begin="0.6s" repeatCount="indefinite"/></circle>
+    <circle r="3.2"><animateMotion path="M 690 420 V 530 H 672 V 580" dur="3.0s" begin="0.1s" repeatCount="indefinite"/></circle>
+    <circle r="3.2"><animateMotion path="M 690 420 V 530 H 912 V 580" dur="3.5s" begin="0.9s" repeatCount="indefinite"/></circle>
+    <circle r="3"><animateMotion path="M 180 670 V 890" dur="2.4s" begin="0.4s" repeatCount="indefinite"/></circle>
+    <circle r="3"><animateMotion path="M 420 670 V 890" dur="2.6s" begin="0.7s" repeatCount="indefinite"/></circle>
+    <circle r="3"><animateMotion path="M 660 670 V 890" dur="2.2s" begin="0.2s" repeatCount="indefinite"/></circle>
+    <circle r="3"><animateMotion path="M 900 670 V 890" dur="2.8s" begin="0.5s" repeatCount="indefinite"/></circle>
+    <circle r="2.8"><animateMotion path="M 180 890 V 670" dur="3.2s" begin="0.8s" repeatCount="indefinite"/></circle>
+    <circle r="2.8"><animateMotion path="M 660 890 V 670" dur="3.4s" begin="0.3s" repeatCount="indefinite"/></circle>
+  </g>
+
+  <!-- METRICS -->
+  <line x1="80" y1="1176" x2="1000" y2="1176" stroke="#000" stroke-width="1" stroke-dasharray="1 5" stroke-opacity="0.35" class="fade" style="animation-delay:1.30s"/>
+  <g class="fade" style="animation-delay:1.38s">
+    <text x="80" y="1218" font-size="20" font-weight="600">02</text>
+    <text x="80" y="1237" font-size="8" letter-spacing="1.4" fill-opacity="0.5">SPINES</text>
+    <text x="320" y="1218" font-size="20" font-weight="600">04</text>
+    <text x="320" y="1237" font-size="8" letter-spacing="1.4" fill-opacity="0.5">LEAVES</text>
+    <text x="600" y="1218" font-size="20" font-weight="600">0.18 ms</text>
+    <text x="600" y="1237" font-size="8" letter-spacing="1.4" fill-opacity="0.5">RTT / FABRIC</text>
+    <text x="860" y="1218" font-size="20" font-weight="600">99.999%</text>
+    <text x="860" y="1237" font-size="8" letter-spacing="1.4" fill-opacity="0.5">UPTIME</text>
+  </g>
+
+  <!-- FOOTER -->
+  <line x1="80" y1="1286" x2="1000" y2="1286" stroke="#000" stroke-width="1.1" pathLength="1" class="draw" style="animation-delay:1.44s"/>
+  <g class="fade" style="animation-delay:1.50s">
+    <circle cx="84" cy="1308" r="3" fill="#000"/>
+    <text x="96" y="1312" font-size="8.5" letter-spacing="1.5">OPERATIONAL</text>
+    <text x="540" y="1312" text-anchor="middle" font-size="8" letter-spacing="1.6" fill-opacity="0.45">SPINE-LEAF / EAST-WEST</text>
+    <text x="1000" y="1312" text-anchor="end" font-size="8.5" letter-spacing="1.4" fill-opacity="0.55">REV 2.4 — 2026</text>
+  </g>
+</svg>

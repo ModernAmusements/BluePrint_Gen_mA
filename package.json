@@ -1,11 +1,13 @@
 {
   "name": "blueprint_gen_ma",
   "version": "1.0.0",
-  "description": "",
+  "description": "Render animated SVG artwork to transparent HEVC, ProRes 4444, and APNG deliverables.",
   "main": "render-video.js",
   "scripts": {
     "render": "node render-video.js test.svg animation",
-    "render:robotarm": "node render-video.js robotarm.svg robotarm"
+    "render:robotarm": "node render-video.js robotarm.svg robotarm",
+    "render:network": "node render-video.js network.svg network 1080x1350",
+    "render:variants": "node render-video.js mesh.svg mesh 1080x1350 && node render-video.js ring.svg ring 1080x1350 && node render-video.js hub.svg hub 1080x1350 && node render-video.js spine.svg spine 1080x1350"
   },
   "keywords": [],
   "author": "",

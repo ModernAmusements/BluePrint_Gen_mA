@@ -1,0 +1,159 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1350" viewBox="0 0 1080 1350" fill="none">
+  <defs>
+    <mask id="ringMask" maskUnits="userSpaceOnUse" x="0" y="0" width="1080" height="1350">
+      <rect width="1080" height="1350" fill="#fff"/>
+      <g fill="#000">
+        <rect x="463" y="386" width="154" height="88" rx="2"/>
+        <rect x="723" y="536" width="154" height="88" rx="2"/>
+        <rect x="723" y="836" width="154" height="88" rx="2"/>
+        <rect x="463" y="986" width="154" height="88" rx="2"/>
+        <rect x="203" y="836" width="154" height="88" rx="2"/>
+        <rect x="203" y="536" width="154" height="88" rx="2"/>
+      </g>
+    </mask>
+  </defs>
+
+  <style>
+    text { font-family: "SF Mono", Menlo, "Roboto Mono", monospace; fill: #000; user-select: none; }
+
+    .draw { stroke-dasharray: 1; stroke-dashoffset: 1; animation: draw 0.9s cubic-bezier(0.25,0.8,0.25,1) forwards; }
+    @keyframes draw { to { stroke-dashoffset: 0; } }
+
+    .fade { opacity: 0; animation: fade 0.5s ease-out forwards; }
+    @keyframes fade { to { opacity: 1; } }
+
+    .card { opacity: 0; transform: scale(0.97); transform-box: fill-box; transform-origin: center; animation: cardIn 0.6s cubic-bezier(0.2,0.7,0.2,1) forwards; }
+    @keyframes cardIn { to { opacity: 1; transform: scale(1); } }
+
+    .flows { opacity: 0; animation: fade 0.6s 1.35s forwards; }
+    .flow { stroke: #000; stroke-width: 3.2; stroke-linecap: round; stroke-dasharray: 0.1 27.9; opacity: 0.6; animation: flow 0.85s linear infinite; }
+    @keyframes flow { to { stroke-dashoffset: -28; } }
+
+    .blink { animation: blink 1.6s ease-in-out infinite; }
+    @keyframes blink { 0%,100% { opacity: 0.15; } 50% { opacity: 1; } }
+
+    .spin { animation: spin 18s linear infinite; transform-origin: 0 0; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .packets { opacity: 0; animation: fade 0.5s 1.45s forwards; }
+  </style>
+
+  <!-- HEADER -->
+  <g class="fade" style="animation-delay:.05s">
+    <text x="80" y="100" font-size="11" letter-spacing="3">RING / 02</text>
+    <text x="1000" y="100" text-anchor="end" font-size="9" letter-spacing="1.4"><tspan class="blink">●</tspan> STATUS 01</text>
+    <text x="80" y="124" font-size="8.5" letter-spacing="2" fill-opacity="0.5">RESILIENT LOOP / DUAL PATH</text>
+    <text x="1000" y="124" text-anchor="end" font-size="8.5" letter-spacing="1.2" fill-opacity="0.5">6 NODES · 6 LINKS</text>
+  </g>
+  <line x1="80" y1="150" x2="1000" y2="150" stroke="#000" stroke-width="1.1" pathLength="1" class="draw" style="animation-delay:.02s"/>
+
+  <!-- RING -->
+  <g mask="url(#ringMask)">
+    <path d="M 540 430 A 300 300 0 1 1 539.9 430" stroke="#000" stroke-width="1.4" pathLength="1" class="draw" style="animation-delay:.15s"/>
+  </g>
+
+  <!-- CENTER -->
+  <g class="fade" style="animation-delay:.9s">
+    <circle cx="540" cy="730" r="140" fill="none" stroke="#000" stroke-width="1" stroke-dasharray="1 6" stroke-opacity="0.25"/>
+    <text x="540" y="722" text-anchor="middle" font-size="16" font-weight="600" letter-spacing="5">RING</text>
+    <text x="540" y="746" text-anchor="middle" font-size="8" letter-spacing="2" fill-opacity="0.5">DUAL PATH</text>
+    <g transform="translate(540,730)">
+      <g class="spin">
+        <path d="M 185 0 A 185 185 0 0 1 131 131" fill="none" stroke="#000" stroke-width="1.2" stroke-dasharray="1 5" stroke-opacity="0.25"/>
+        <circle cx="185" cy="0" r="3" fill="#000" fill-opacity="0.7"/>
+      </g>
+    </g>
+  </g>
+
+  <!-- FLOWS -->
+  <g class="flows" fill="none" mask="url(#ringMask)">
+    <circle class="flow" cx="540" cy="730" r="300"/>
+    <circle class="flow" cx="540" cy="730" r="300" style="animation-direction:reverse; animation-duration:1.4s; opacity:.25"/>
+  </g>
+
+  <!-- PACKETS -->
+  <g class="packets" fill="#000" mask="url(#ringMask)">
+    <circle r="3.4"><animateMotion path="M 540 430 A 300 300 0 1 1 539.9 430" dur="7s" repeatCount="indefinite"/></circle>
+    <circle r="3.4"><animateMotion path="M 540 430 A 300 300 0 1 1 539.9 430" dur="9s" begin="2.4s" repeatCount="indefinite"/></circle>
+    <circle r="3"><animateMotion path="M 540 430 A 300 300 0 1 1 539.9 430" dur="11s" begin="4.6s" repeatCount="indefinite"/></circle>
+    <circle r="3"><animateMotion path="M 540 430 A 300 300 0 1 0 540.1 430" dur="8.5s" begin="1.2s" repeatCount="indefinite"/></circle>
+    <circle r="3"><animateMotion path="M 540 430 A 300 300 0 1 0 540.1 430" dur="10s" begin="3.8s" repeatCount="indefinite"/></circle>
+  </g>
+
+  <!-- NODES -->
+  <g transform="translate(540,430)">
+    <g class="card" style="animation-delay:.55s">
+      <rect x="-75" y="-42" width="150" height="84" rx="2" stroke="#000" stroke-width="1.5"/>
+      <circle cx="64" cy="-32" r="2.2" fill="#000" class="blink"/>
+      <text x="0" y="-4" text-anchor="middle" font-size="10.5" font-weight="600" letter-spacing="2">EDGE-A</text>
+      <text x="0" y="14" text-anchor="middle" font-size="8" fill-opacity="0.5">203.0.113.1</text>
+    </g>
+  </g>
+
+  <g transform="translate(800,580)">
+    <g class="card" style="animation-delay:.62s">
+      <rect x="-75" y="-42" width="150" height="84" rx="2" stroke="#000" stroke-width="1.5"/>
+      <circle cx="64" cy="-32" r="2.2" fill="#000" class="blink" style="animation-delay:.3s"/>
+      <text x="0" y="-4" text-anchor="middle" font-size="10.5" font-weight="600" letter-spacing="2">CORE-1</text>
+      <text x="0" y="14" text-anchor="middle" font-size="8" fill-opacity="0.5">10.0.0.1</text>
+    </g>
+  </g>
+
+  <g transform="translate(800,880)">
+    <g class="card" style="animation-delay:.69s">
+      <rect x="-75" y="-42" width="150" height="84" rx="2" stroke="#000" stroke-width="1.5"/>
+      <circle cx="64" cy="-32" r="2.2" fill="#000" class="blink" style="animation-delay:.6s"/>
+      <text x="0" y="-4" text-anchor="middle" font-size="10.5" font-weight="600" letter-spacing="2">COMPUTE</text>
+      <text x="0" y="14" text-anchor="middle" font-size="8" fill-opacity="0.5">K8S · 12 PODS</text>
+    </g>
+  </g>
+
+  <g transform="translate(540,1030)">
+    <g class="card" style="animation-delay:.76s">
+      <rect x="-75" y="-42" width="150" height="84" rx="2" stroke="#000" stroke-width="1.5"/>
+      <circle cx="64" cy="-32" r="2.2" fill="#000" class="blink" style="animation-delay:.9s"/>
+      <text x="0" y="-4" text-anchor="middle" font-size="10.5" font-weight="600" letter-spacing="2">STORAGE</text>
+      <text x="0" y="14" text-anchor="middle" font-size="8" fill-opacity="0.5">CEPH · 240 TB</text>
+    </g>
+  </g>
+
+  <g transform="translate(280,880)">
+    <g class="card" style="animation-delay:.83s">
+      <rect x="-75" y="-42" width="150" height="84" rx="2" stroke="#000" stroke-width="1.5"/>
+      <circle cx="64" cy="-32" r="2.2" fill="#000" class="blink" style="animation-delay:.2s"/>
+      <text x="0" y="-4" text-anchor="middle" font-size="10.5" font-weight="600" letter-spacing="2">SERVICES</text>
+      <text x="0" y="14" text-anchor="middle" font-size="8" fill-opacity="0.5">API · 8 REPLICAS</text>
+    </g>
+  </g>
+
+  <g transform="translate(280,580)">
+    <g class="card" style="animation-delay:.90s">
+      <rect x="-75" y="-42" width="150" height="84" rx="2" stroke="#000" stroke-width="1.5"/>
+      <circle cx="64" cy="-32" r="2.2" fill="#000" class="blink" style="animation-delay:.5s"/>
+      <text x="0" y="-4" text-anchor="middle" font-size="10.5" font-weight="600" letter-spacing="2">BACKUP</text>
+      <text x="0" y="14" text-anchor="middle" font-size="8" fill-opacity="0.5">S3 · 12 TB</text>
+    </g>
+  </g>
+
+  <!-- METRICS -->
+  <line x1="80" y1="1176" x2="1000" y2="1176" stroke="#000" stroke-width="1" stroke-dasharray="1 5" stroke-opacity="0.35" class="fade" style="animation-delay:1.30s"/>
+  <g class="fade" style="animation-delay:1.38s">
+    <text x="80" y="1218" font-size="20" font-weight="600">06</text>
+    <text x="80" y="1237" font-size="8" letter-spacing="1.4" fill-opacity="0.5">NODES</text>
+    <text x="320" y="1218" font-size="20" font-weight="600">06</text>
+    <text x="320" y="1237" font-size="8" letter-spacing="1.4" fill-opacity="0.5">LINKS</text>
+    <text x="600" y="1218" font-size="20" font-weight="600">0.38 ms</text>
+    <text x="600" y="1237" font-size="8" letter-spacing="1.4" fill-opacity="0.5">RTT / LOOP</text>
+    <text x="860" y="1218" font-size="20" font-weight="600">99.99%</text>
+    <text x="860" y="1237" font-size="8" letter-spacing="1.4" fill-opacity="0.5">UPTIME</text>
+  </g>
+
+  <!-- FOOTER -->
+  <line x1="80" y1="1286" x2="1000" y2="1286" stroke="#000" stroke-width="1.1" pathLength="1" class="draw" style="animation-delay:1.44s"/>
+  <g class="fade" style="animation-delay:1.50s">
+    <circle cx="84" cy="1308" r="3" fill="#000"/>
+    <text x="96" y="1312" font-size="8.5" letter-spacing="1.5">OPERATIONAL</text>
+    <text x="540" y="1312" text-anchor="middle" font-size="8" letter-spacing="1.6" fill-opacity="0.45">RING / DUAL PATH</text>
+    <text x="1000" y="1312" text-anchor="end" font-size="8.5" letter-spacing="1.4" fill-opacity="0.55">REV 2.4 — 2026</text>
+  </g>
+</svg>

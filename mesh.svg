@@ -1,0 +1,174 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1350" viewBox="0 0 1080 1350" fill="none">
+  <defs>
+    <mask id="meshMask" maskUnits="userSpaceOnUse" x="0" y="0" width="1080" height="1350">
+      <rect width="1080" height="1350" fill="#fff"/>
+      <g fill="#000">
+        <rect x="468" y="314" width="144" height="92" rx="2"/>
+        <rect x="754" y="494" width="144" height="92" rx="2"/>
+        <rect x="754" y="854" width="144" height="92" rx="2"/>
+        <rect x="468" y="1034" width="144" height="92" rx="2"/>
+        <rect x="182" y="854" width="144" height="92" rx="2"/>
+        <rect x="182" y="494" width="144" height="92" rx="2"/>
+      </g>
+    </mask>
+  </defs>
+
+  <style>
+    text { font-family: "SF Mono", Menlo, "Roboto Mono", monospace; fill: #000; user-select: none; }
+
+    .draw { stroke-dasharray: 1; stroke-dashoffset: 1; animation: draw 0.75s cubic-bezier(0.25,0.8,0.25,1) forwards; }
+    @keyframes draw { to { stroke-dashoffset: 0; } }
+
+    .fade { opacity: 0; animation: fade 0.5s ease-out forwards; }
+    @keyframes fade { to { opacity: 1; } }
+
+    .card { opacity: 0; transform: scale(0.97); transform-box: fill-box; transform-origin: center; animation: cardIn 0.6s cubic-bezier(0.2,0.7,0.2,1) forwards; }
+    @keyframes cardIn { to { opacity: 1; transform: scale(1); } }
+
+    .flows { opacity: 0; animation: fade 0.6s 1.35s forwards; }
+    .flow { stroke: #000; stroke-width: 3.2; stroke-linecap: round; stroke-dasharray: 0.1 27.9; opacity: 0.6; animation: flow 0.85s linear infinite; }
+    @keyframes flow { to { stroke-dashoffset: -28; } }
+
+    .blink { animation: blink 1.6s ease-in-out infinite; }
+    @keyframes blink { 0%,100% { opacity: 0.15; } 50% { opacity: 1; } }
+
+    .ping { animation: ping 2.6s ease-out infinite; transform-origin: 0 0; }
+    @keyframes ping { 0% { transform: scale(0.5); opacity: 0.6; } 100% { transform: scale(1.8); opacity: 0; } }
+
+    .packets { opacity: 0; animation: fade 0.5s 1.45s forwards; }
+  </style>
+
+  <!-- HEADER -->
+  <g class="fade" style="animation-delay:.05s">
+    <text x="80" y="100" font-size="11" letter-spacing="3">MESH / 01</text>
+    <text x="1000" y="100" text-anchor="end" font-size="9" letter-spacing="1.4"><tspan class="blink">●</tspan> STATUS 01</text>
+    <text x="80" y="124" font-size="8.5" letter-spacing="2" fill-opacity="0.5">PEER-TO-PEER / SELF-HEALING</text>
+    <text x="1000" y="124" text-anchor="end" font-size="8.5" letter-spacing="1.2" fill-opacity="0.5">6 NODES · 9 LINKS</text>
+  </g>
+  <line x1="80" y1="150" x2="1000" y2="150" stroke="#000" stroke-width="1.1" pathLength="1" class="draw" style="animation-delay:.02s"/>
+
+  <!-- LINKS -->
+  <g mask="url(#meshMask)" stroke="#000" stroke-width="1.4">
+    <path d="M 540 360 L 826 540" pathLength="1" class="draw" style="animation-delay:.18s"/>
+    <path d="M 826 540 L 826 900" pathLength="1" class="draw" style="animation-delay:.24s"/>
+    <path d="M 826 900 L 540 1080" pathLength="1" class="draw" style="animation-delay:.30s"/>
+    <path d="M 540 1080 L 254 900" pathLength="1" class="draw" style="animation-delay:.36s"/>
+    <path d="M 254 900 L 254 540" pathLength="1" class="draw" style="animation-delay:.42s"/>
+    <path d="M 254 540 L 540 360" pathLength="1" class="draw" style="animation-delay:.48s"/>
+    <path d="M 540 360 L 540 1080" pathLength="1" class="draw" style="animation-delay:.34s"/>
+    <path d="M 826 540 L 254 900" pathLength="1" class="draw" style="animation-delay:.40s"/>
+    <path d="M 826 900 L 254 540" pathLength="1" class="draw" style="animation-delay:.46s"/>
+  </g>
+
+  <!-- CENTER -->
+  <g class="fade" style="animation-delay:.95s" transform="translate(540,720)">
+    <circle r="4" fill="#000"/>
+    <circle r="26" fill="none" stroke="#000" stroke-width="1" stroke-opacity="0.25" class="ping"/>
+  </g>
+
+  <!-- FLOWS -->
+  <g class="flows" fill="none" mask="url(#meshMask)">
+    <path class="flow" d="M 540 360 L 826 540"/>
+    <path class="flow" d="M 826 540 L 826 900"/>
+    <path class="flow" d="M 826 900 L 540 1080"/>
+    <path class="flow" d="M 540 1080 L 254 900"/>
+    <path class="flow" d="M 254 900 L 254 540"/>
+    <path class="flow" d="M 254 540 L 540 360"/>
+    <path class="flow" d="M 540 360 L 540 1080" style="animation-duration:1.1s"/>
+    <path class="flow" d="M 826 540 L 254 900" style="animation-duration:1.2s"/>
+    <path class="flow" d="M 826 900 L 254 540" style="animation-duration:1.3s"/>
+    <path class="flow" d="M 540 1080 L 540 360" style="animation-duration:1.35s; opacity:.3"/>
+    <path class="flow" d="M 254 900 L 826 540" style="animation-duration:1.45s; opacity:.3"/>
+    <path class="flow" d="M 254 540 L 826 900" style="animation-duration:1.5s; opacity:.3"/>
+  </g>
+
+  <!-- PACKETS -->
+  <g class="packets" fill="#000" mask="url(#meshMask)">
+    <circle r="3.2"><animateMotion path="M 540 360 L 826 540" dur="2.6s" repeatCount="indefinite"/></circle>
+    <circle r="3.2"><animateMotion path="M 826 540 L 826 900" dur="2.2s" begin="0.5s" repeatCount="indefinite"/></circle>
+    <circle r="3.2"><animateMotion path="M 826 900 L 540 1080" dur="2.8s" begin="0.2s" repeatCount="indefinite"/></circle>
+    <circle r="3.2"><animateMotion path="M 540 1080 L 254 900" dur="2.5s" begin="0.8s" repeatCount="indefinite"/></circle>
+    <circle r="3.2"><animateMotion path="M 254 900 L 254 540" dur="2.3s" begin="0.3s" repeatCount="indefinite"/></circle>
+    <circle r="3.2"><animateMotion path="M 254 540 L 540 360" dur="2.7s" begin="0.6s" repeatCount="indefinite"/></circle>
+    <circle r="2.8"><animateMotion path="M 540 360 L 540 1080" dur="3.4s" begin="0.4s" repeatCount="indefinite"/></circle>
+    <circle r="2.8"><animateMotion path="M 826 540 L 254 900" dur="3.6s" begin="0.9s" repeatCount="indefinite"/></circle>
+    <circle r="2.8"><animateMotion path="M 826 900 L 254 540" dur="3.8s" begin="0.1s" repeatCount="indefinite"/></circle>
+  </g>
+
+  <!-- NODES -->
+  <g transform="translate(540,360)">
+    <g class="card" style="animation-delay:.55s">
+      <rect x="-70" y="-44" width="140" height="88" rx="2" stroke="#000" stroke-width="1.5"/>
+      <circle cx="58" cy="-34" r="2.2" fill="#000" class="blink"/>
+      <text x="0" y="-4" text-anchor="middle" font-size="10.5" font-weight="600" letter-spacing="2">CORE</text>
+      <text x="0" y="14" text-anchor="middle" font-size="8" fill-opacity="0.5">SW-01 · 10.0.0.1</text>
+    </g>
+  </g>
+
+  <g transform="translate(826,540)">
+    <g class="card" style="animation-delay:.62s">
+      <rect x="-70" y="-44" width="140" height="88" rx="2" stroke="#000" stroke-width="1.5"/>
+      <circle cx="58" cy="-34" r="2.2" fill="#000" class="blink" style="animation-delay:.3s"/>
+      <text x="0" y="-4" text-anchor="middle" font-size="10.5" font-weight="600" letter-spacing="2">EDGE</text>
+      <text x="0" y="14" text-anchor="middle" font-size="8" fill-opacity="0.5">203.0.113.1</text>
+    </g>
+  </g>
+
+  <g transform="translate(826,900)">
+    <g class="card" style="animation-delay:.69s">
+      <rect x="-70" y="-44" width="140" height="88" rx="2" stroke="#000" stroke-width="1.5"/>
+      <circle cx="58" cy="-34" r="2.2" fill="#000" class="blink" style="animation-delay:.6s"/>
+      <text x="0" y="-4" text-anchor="middle" font-size="10.5" font-weight="600" letter-spacing="2">COMPUTE</text>
+      <text x="0" y="14" text-anchor="middle" font-size="8" fill-opacity="0.5">K8S · 12 PODS</text>
+    </g>
+  </g>
+
+  <g transform="translate(540,1080)">
+    <g class="card" style="animation-delay:.76s">
+      <rect x="-70" y="-44" width="140" height="88" rx="2" stroke="#000" stroke-width="1.5"/>
+      <circle cx="58" cy="-34" r="2.2" fill="#000" class="blink" style="animation-delay:.9s"/>
+      <text x="0" y="-4" text-anchor="middle" font-size="10.5" font-weight="600" letter-spacing="2">STORAGE</text>
+      <text x="0" y="14" text-anchor="middle" font-size="8" fill-opacity="0.5">CEPH · 240 TB</text>
+    </g>
+  </g>
+
+  <g transform="translate(254,900)">
+    <g class="card" style="animation-delay:.83s">
+      <rect x="-70" y="-44" width="140" height="88" rx="2" stroke="#000" stroke-width="1.5"/>
+      <circle cx="58" cy="-34" r="2.2" fill="#000" class="blink" style="animation-delay:.2s"/>
+      <text x="0" y="-4" text-anchor="middle" font-size="10.5" font-weight="600" letter-spacing="2">SERVICES</text>
+      <text x="0" y="14" text-anchor="middle" font-size="8" fill-opacity="0.5">API · 8 REPLICAS</text>
+    </g>
+  </g>
+
+  <g transform="translate(254,540)">
+    <g class="card" style="animation-delay:.90s">
+      <rect x="-70" y="-44" width="140" height="88" rx="2" stroke="#000" stroke-width="1.5"/>
+      <circle cx="58" cy="-34" r="2.2" fill="#000" class="blink" style="animation-delay:.5s"/>
+      <text x="0" y="-4" text-anchor="middle" font-size="10.5" font-weight="600" letter-spacing="2">BACKUP</text>
+      <text x="0" y="14" text-anchor="middle" font-size="8" fill-opacity="0.5">S3 · 12 TB</text>
+    </g>
+  </g>
+
+  <!-- METRICS -->
+  <line x1="80" y1="1176" x2="1000" y2="1176" stroke="#000" stroke-width="1" stroke-dasharray="1 5" stroke-opacity="0.35" class="fade" style="animation-delay:1.30s"/>
+  <g class="fade" style="animation-delay:1.38s">
+    <text x="80" y="1218" font-size="20" font-weight="600">06</text>
+    <text x="80" y="1237" font-size="8" letter-spacing="1.4" fill-opacity="0.5">NODES</text>
+    <text x="320" y="1218" font-size="20" font-weight="600">09</text>
+    <text x="320" y="1237" font-size="8" letter-spacing="1.4" fill-opacity="0.5">LINKS</text>
+    <text x="600" y="1218" font-size="20" font-weight="600">0.31 ms</text>
+    <text x="600" y="1237" font-size="8" letter-spacing="1.4" fill-opacity="0.5">RTT / PEER</text>
+    <text x="860" y="1218" font-size="20" font-weight="600">99.995%</text>
+    <text x="860" y="1237" font-size="8" letter-spacing="1.4" fill-opacity="0.5">UPTIME</text>
+  </g>
+
+  <!-- FOOTER -->
+  <line x1="80" y1="1286" x2="1000" y2="1286" stroke="#000" stroke-width="1.1" pathLength="1" class="draw" style="animation-delay:1.44s"/>
+  <g class="fade" style="animation-delay:1.50s">
+    <circle cx="84" cy="1308" r="3" fill="#000"/>
+    <text x="96" y="1312" font-size="8.5" letter-spacing="1.5">OPERATIONAL</text>
+    <text x="540" y="1312" text-anchor="middle" font-size="8" letter-spacing="1.6" fill-opacity="0.45">MESH / PEER-TO-PEER</text>
+    <text x="1000" y="1312" text-anchor="end" font-size="8.5" letter-spacing="1.4" fill-opacity="0.55">REV 2.4 — 2026</text>
+  </g>
+</svg>
